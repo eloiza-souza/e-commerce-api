@@ -2,6 +2,7 @@ package com.zup.e_commerce.services;
 
 import com.zup.e_commerce.dtos.ProductRequest;
 import com.zup.e_commerce.dtos.ProductResponse;
+import com.zup.e_commerce.exceptions.ProductNotFoundException;
 import com.zup.e_commerce.models.Product;
 import com.zup.e_commerce.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteProduct(Long id) {
         if (!productRepository.existsById(id)){
-            throw new RuntimeException("Produto com id " + id + " não encontrado.");
+            throw new ProductNotFoundException("Produto com id " + id + " não encontrado.");
         }
         productRepository.deleteById(id);
     }

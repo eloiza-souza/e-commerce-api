@@ -22,7 +22,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse addProduct(ProductRequest productRequest) {
         String name = productRequest.name();
         if (productRepository.existsByName(name)){
-            throw new DuplicateFieldException("O nome \"" + name + "\" já existe.");
+            throw new DuplicateFieldException("O produto com o nome \"" + name + "\" já existe.");
         }
         Product product = mapToEntity(productRequest);
         productRepository.save(product);

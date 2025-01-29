@@ -2,6 +2,7 @@ package com.zup.e_commerce.services;
 
 import com.zup.e_commerce.dtos.ProductRequest;
 import com.zup.e_commerce.dtos.ProductResponse;
+import com.zup.e_commerce.exceptions.DuplicateFieldException;
 import com.zup.e_commerce.exceptions.ProductNotFoundException;
 import com.zup.e_commerce.models.Product;
 import com.zup.e_commerce.repositories.ProductRepository;
@@ -19,6 +20,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse addProduct(ProductRequest productRequest) {
+        String name = productRequest.name();
+        if (productRepository.existsByName(name)){
+            throw new DuplicateFieldException("O nome \"" + name + "\" já existe.");
+        }
         Product product = mapToEntity(productRequest);
         productRepository.save(product);
         return mapToResponse(product);

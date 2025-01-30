@@ -14,6 +14,15 @@ funcionamento de uma loja virtual, com validações e manipulação de dados.
     - Preço deve ser maior que 0.
     - Quantidade deve ser maior ou igual a 0.
 
+### Clientes
+- **POST /clientes**: Cadastra um novo cliente.
+  - Validações:
+    - Nome é obrigatório.
+    - CPF deve ser único e válido.
+    - Email deve ser único e válido.
+- **GET /clientes/{cpf}**: Retorna os dados de um cliente específico pelo CPF.
+- **PUT /clientes/{cpf}**: Atualiza os dados de um cliente pelo CPF.
+
 
 ## Tecnologias Utilizadas
 - **Java 17**
@@ -34,7 +43,6 @@ src/main/java/com/zup/e_commerce
 ├── models                      # Entidades de domínio
 ├── repositories                # Interfaces de repositórios (Spring Data JPA)
 ├── services                    # Regras de negócio e lógica de aplicação
-├── util                        # Utilitários (ex.: Validador de CPF)
 └── EcommerceApplication.java   # Classe principal
 ```
 
@@ -43,6 +51,11 @@ src/main/java/com/zup/e_commerce
    - Nome deve ser único.
    - Preço deve ser maior que 0.
    - Quantidade deve ser maior ou igual a 0.
+   
+2. **Cadastro de Clientes**:
+   - CPF deve ser único e válido.
+   - Email deve ser único e válido.
+
 
 ## Como Executar o Projeto
 
@@ -71,6 +84,15 @@ src/main/java/com/zup/e_commerce
   "name": "Produto 1",
   "price": 100.0,
   "quantity": 10
+}
+```
+### Cadastro de Cliente
+**POST /clientes**
+```json
+{
+  "nome": "João Silva",
+  "cpf": "12345678900",
+  "email": "joao.silva@email.com"
 }
 ```
 

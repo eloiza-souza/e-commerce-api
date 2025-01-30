@@ -23,6 +23,13 @@ funcionamento de uma loja virtual, com validações e manipulação de dados.
 - **GET /clientes/{cpf}**: Retorna os dados de um cliente específico pelo CPF.
 - **PUT /clientes/{cpf}**: Atualiza os dados de um cliente pelo CPF.
 
+### Compras
+- **POST /compras**: Registra uma nova compra.
+  - O cliente é identificado pelo CPF.
+  - A quantidade do produto é reduzida no estoque após a compra.
+  - Validações:
+    - Produtos com quantidade 0 não podem ser comprados.
+    - Retorna erro 400 com a mensagem: `{"erro": "Produto em falta: [nome do produto]"}` se o produto estiver indisponível.
 
 ## Tecnologias Utilizadas
 - **Java 17**
@@ -55,6 +62,10 @@ src/main/java/com/zup/e_commerce
 2. **Cadastro de Clientes**:
    - CPF deve ser único e válido.
    - Email deve ser único e válido.
+
+3. **Realização de Compras**:
+   - Produtos com quantidade 0 não podem ser comprados.
+   - A quantidade do produto no estoque é reduzida após a compra.
 
 
 ## Como Executar o Projeto
@@ -90,9 +101,20 @@ src/main/java/com/zup/e_commerce
 **POST /clientes**
 ```json
 {
-  "nome": "João Silva",
+  "name": "João Silva",
   "cpf": "12345678900",
   "email": "joao.silva@email.com"
+}
+```
+### Realização de Compra
+**POST /compras**
+```json
+{
+  "cpf": "12345678900",
+  "productNames":  [
+    "Produto1",
+    "Produto2"
+  ]
 }
 ```
 

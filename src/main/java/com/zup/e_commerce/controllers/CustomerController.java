@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/clientes")
 @Validated
@@ -35,6 +37,16 @@ public class CustomerController {
     })
     public ResponseEntity<CustomerResponse> registerCustomer(@Valid @RequestBody CustomerRequest customerRequest){
         return ResponseEntity.status(HttpStatus.CREATED).body(customerService.addCustomer(customerRequest));
+    }
+
+    @Operation(summary = "Obter todos os clientes")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de clientes recuperada com sucesso"),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor")
+    })
+    @GetMapping
+    public ResponseEntity<List<CustomerResponse>> getAllCustomers(){
+        return ResponseEntity.ok(customerService.getAllCustomers());
     }
 
     @GetMapping("/{cpf}")

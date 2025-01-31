@@ -9,6 +9,9 @@ import com.zup.e_commerce.repositories.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
@@ -30,6 +33,13 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = mapToEntity(customerRequest);
         customerRepository.save(customer);
         return mapToResponse(customer);
+    }
+    @Override
+    public List<CustomerResponse> getAllCustomers(){
+        return customerRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
     @Override

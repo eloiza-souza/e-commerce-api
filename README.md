@@ -118,6 +118,15 @@ src/main/java/com/zup/e_commerce
 }
 ```
 
+## Documentação do Swagger 📜
+
+A documentação do Swagger foi configurada para facilitar a interação com a API RESTful do sistema de E-Commerce. Abaixo estão as instruções para acessar e utilizar o Swagger.
+
+### Acessando o Swagger UI 🌐
+Após iniciar a aplicação, a documentação interativa do Swagger estará disponível no seguinte endereço:
+- **URL**: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+
+O Swagger UI permite que você visualize e teste os endpoints da API diretamente no navegador.
 
 ## Contribuição
 

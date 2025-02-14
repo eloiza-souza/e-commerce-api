@@ -11,8 +11,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+
+import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -76,7 +78,51 @@ public class ProductServiceImplTest {
         verify(productRepository).save(product);
         verify(productMapper).toResponse(product);
     }
-    
+
+    @Test
+    void whenProductsExistIfGettingAllProductsShouldReturnListOfProductResponses() {
+        // Given
+        Product product1 = new Product("Produto 1", 5.98, 100);
+        product1.setId(1L);
+        Product product2 = new Product("Produto 2", 6.58, 200);
+        product2.setId(2L);
+        ProductResponse response1 = new ProductResponse(1L, "Produto 1", 5.98, 100);
+        ProductResponse response2 = new ProductResponse(2L, "Produto 2", 6.58, 200);
+
+        when(productRepository.findAll()).thenReturn(List.of(product1, product2));
+        when(productMapper.toResponse(product1)).thenReturn(response1);
+        when(productMapper.toResponse(product2)).thenReturn(response2);
+
+        // When
+        List<ProductResponse> result = productService.getAllProducts();
+
+        // Then
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals(response1, result.get(0));
+        assertEquals(response2, result.get(1));
+
+        verify(productRepository).findAll();
+        verify(productMapper).toResponse(product1);
+        verify(productMapper).toResponse(product2);
+    }
+
+    @Test
+    void whenNoProductsExistIfGettingAllProductsShouldReturnEmptyList() {
+        // Given
+        when(productRepository.findAll()).thenReturn(Collections.emptyList());
+
+        // When
+        List<ProductResponse> result = productService.getAllProducts();
+
+        // Then
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+
+        verify(productRepository).findAll();
+        verify(productMapper, never()).toResponse(any(Product.class));
+    }
+
     @Test
     void whenDeletingProductByIdIfProductIdDoesNotExistShouldThrowException() {
         //given
@@ -88,7 +134,7 @@ public class ProductServiceImplTest {
 
         //then
         verify(productRepository).existsById(id);
-        verify(productRepository, Mockito.never()).deleteById(id);
+        verify(productRepository, never()).deleteById(id);
     }
 
     @Test

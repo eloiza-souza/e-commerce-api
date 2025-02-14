@@ -17,11 +17,15 @@ import java.util.List;
 @Service
 public class PurchaseServiceImpl implements PurchaseService {
 
-    @Autowired
-    private CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
+
+    private final ProductRepository productRepository;
 
     @Autowired
-    private ProductRepository productRepository;
+    public PurchaseServiceImpl(CustomerRepository customerRepository, ProductRepository productRepository) {
+        this.customerRepository = customerRepository;
+        this.productRepository = productRepository;
+    }
 
     @Override
     public String processPurchase(PurchaseRequest request) {

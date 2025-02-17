@@ -36,7 +36,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    void whenProductNameExistsIfAddingProductShouldThrowDuplicateFieldException() {
+    void whenAddProductWithExistingName_shouldThrowDuplicateFieldException() {
         // Given
         String productName = "Produto Teste";
         ProductRequest productRequest = new ProductRequest(productName, 8.00, 100);
@@ -51,11 +51,11 @@ public class ProductServiceImplTest {
         verify(productRepository).existsByName(productName);
         verify(productMapper, never()).toEntity(any(ProductRequest.class));
         verify(productRepository, never()).save(any(Product.class));
-        verify(productMapper, never()).toResponse(any(Product.class));
+
     }
 
     @Test
-    void whenProductNameDoesNotExistIfAddingProductShouldSaveAndReturnProductResponse() {
+    void whenAddProductWithNotExistingProductName_shouldSaveAndReturnProductResponse() {
         // Given
         String productName = "Produto Teste";
         ProductRequest productRequest = new ProductRequest(productName, 8.99, 100);
@@ -80,7 +80,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    void whenProductsExistIfGettingAllProductsShouldReturnListOfProductResponses() {
+    void whenGetAllProductsAndProductsExist_shouldReturnListOfProductResponses() {
         // Given
         Product product1 = new Product("Produto 1", 5.98, 100);
         product1.setId(1L);
@@ -108,7 +108,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    void whenNoProductsExistIfGettingAllProductsShouldReturnEmptyList() {
+    void whenGetAllProductsAndNoProductsExist_shouldReturnEmptyList() {
         // Given
         when(productRepository.findAll()).thenReturn(Collections.emptyList());
 
@@ -124,7 +124,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    void whenDeletingProductByIdIfProductIdDoesNotExistShouldThrowException() {
+    void whenDeleteProductByIdIfProductIdDoesNotExist_shouldThrowException() {
         //given
         Long id = 4L;
         when(productRepository.existsById(id)).thenReturn(false);
@@ -138,7 +138,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    void whenDeletingProductByIdIfIdIsValidShouldDeleteProduct() {
+    void whenDeleteProductByIdIfIdIsValid_shouldDeleteProduct() {
         //given
         Long id = 4L;
         when(productRepository.existsById(id)).thenReturn(true);

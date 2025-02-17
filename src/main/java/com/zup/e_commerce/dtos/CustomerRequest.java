@@ -2,6 +2,7 @@ package com.zup.e_commerce.dtos;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.br.CPF;
 
 public record CustomerRequest(
@@ -10,6 +11,7 @@ public record CustomerRequest(
 
 
         @CPF(message = "O CPF deve ser válido.")
+        @NotNull (message = "O CPF é obrigatório.")
         String cpf,
 
 

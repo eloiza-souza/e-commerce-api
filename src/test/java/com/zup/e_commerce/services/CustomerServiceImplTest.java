@@ -5,12 +5,16 @@ import com.zup.e_commerce.dtos.CustomerResponse;
 import com.zup.e_commerce.exceptions.DuplicateFieldException;
 import com.zup.e_commerce.mappers.CustomerMapper;
 import com.zup.e_commerce.models.Customer;
+import com.zup.e_commerce.models.Product;
 import com.zup.e_commerce.repositories.CustomerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -95,4 +99,41 @@ class CustomerServiceImplTest {
         assertEquals("Já existe um cliente cadastrado com o email: test@example.com.", exception.getMessage());
         verify(customerRepository, never()).save(any());
     }
+
+    @Test
+    void whenGetAllCustomersAndCustomersExists_shouldReturnListOfCustomerResponses() {
+        Customer customer1 = new Customer("Name1", "12345678901", "email1@example.com");
+        Customer customer2 = new Customer("Name2", "98765432109", "email2@example.com");
+        CustomerResponse response1 = new CustomerResponse(1L, "Name1", "12345678901", "email1@example.com");
+        CustomerResponse response2 = new CustomerResponse(2L, "Name2", "98765432109", "email2@example.com");
+
+        when(customerRepository.findAll()).thenReturn(List.of(customer1, customer2));
+        when(customerMapper.toResponse(customer1)).thenReturn(response1);
+        when(customerMapper.toResponse(customer2)).thenReturn(response2);
+
+        List<CustomerResponse> result = customerService.getAllCustomers();
+
+        assertNotNull(result, "A lista de respostas não deve ser nula.");
+        assertEquals(2, result.size(), "A lista deve conter 2 elementos.");
+        assertEquals(response1, result.get(0));
+        assertEquals(response2, result.get(1));
+    }
+
+    @Test
+    void whenGetAllCustomersAndNoCustomersExists_shouldReturnListOfCustomerResponses() {
+        //given
+        when(customerRepository.findAll()).thenReturn(Collections.emptyList());
+
+        //when
+        List<CustomerResponse> result = customerService.getAllCustomers();
+
+        //then
+        assertNotNull(result, "A lista de respostas não deve ser nula.");
+        assertTrue(result.isEmpty(),"A lista deve estar vazia.");
+
+        verify(customerRepository).findAll();
+        verify(customerMapper, never()).toResponse(any(Customer.class));
+
+    }
+
 }

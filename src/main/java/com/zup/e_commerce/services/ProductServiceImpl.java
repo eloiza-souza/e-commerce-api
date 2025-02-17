@@ -25,6 +25,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse addProduct(ProductRequest productRequest) {
+        if(productRequest == null){
+            throw new IllegalArgumentException("ProductRequest não pode ser nulo");
+        }
         String name = productRequest.name();
         if (productRepository.existsByName(name)) {
             throw new DuplicateFieldException("O produto com o nome \"" + name + "\" já existe.");

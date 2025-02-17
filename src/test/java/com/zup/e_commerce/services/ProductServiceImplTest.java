@@ -36,6 +36,14 @@ public class ProductServiceImplTest {
     }
 
     @Test
+    void whenAddProductWithNullRequest_shouldThrowIllegalArgumentException() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            productService.addProduct(null);
+        });
+        assertEquals("ProductRequest não pode ser nulo", exception.getMessage());
+    }
+
+    @Test
     void whenAddProductWithExistingName_shouldThrowDuplicateFieldException() {
         // Given
         String productName = "Produto Teste";

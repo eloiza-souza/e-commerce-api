@@ -4,6 +4,7 @@ import com.zup.e_commerce.dtos.CustomerRequest;
 import com.zup.e_commerce.dtos.CustomerResponse;
 import com.zup.e_commerce.exceptions.CustomerNotFoundException;
 import com.zup.e_commerce.exceptions.DuplicateFieldException;
+import com.zup.e_commerce.mappers.CustomerMapper;
 import com.zup.e_commerce.models.Customer;
 import com.zup.e_commerce.repositories.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +18,12 @@ public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository customerRepository;
 
+    private final CustomerMapper customerMapper;
+
     @Autowired
-    public CustomerServiceImpl(CustomerRepository customerRepository) {
+    public CustomerServiceImpl(CustomerRepository customerRepository, CustomerMapper customerMapper) {
         this.customerRepository = customerRepository;
+        this.customerMapper = customerMapper;
     }
 
     @Override
@@ -34,15 +38,15 @@ public class CustomerServiceImpl implements CustomerService {
             throw new DuplicateFieldException("Já existe um cliente cadastrado com o email: " + email + ".");
         }
 
-        Customer customer = mapToEntity(customerRequest);
+        Customer customer = customerMapper.toEntity(customerRequest);
         customerRepository.save(customer);
-        return mapToResponse(customer);
+        return customerMapper.toResponse(customer);
     }
     @Override
     public List<CustomerResponse> getAllCustomers(){
         return customerRepository.findAll()
                 .stream()
-                .map(this::mapToResponse)
+                .map(customerMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
@@ -50,7 +54,7 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerResponse getCustomerByCpf(String cpf) {
         Customer customer = customerRepository.findByCpf(cpf)
                 .orElseThrow(() -> new CustomerNotFoundException("Cliente com CPF: " + cpf + " não encontrado."));
-        return mapToResponse(customer);
+        return customerMapper.toResponse(customer);
     }
 
     @Override
@@ -61,20 +65,8 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setCpf(customerRequest.cpf());
         customer.setEmail(customerRequest.email());
         customerRepository.save(customer);
-        return mapToResponse(customer);
+        return customerMapper.toResponse(customer);
     }
 
-    private Customer mapToEntity(CustomerRequest customerRequest) {
 
-        return new Customer(customerRequest.name(),
-                customerRequest.cpf(),
-                customerRequest.email());
-    }
-
-    private CustomerResponse mapToResponse(Customer customer) {
-        return new CustomerResponse(customer.getId(),
-                customer.getName(),
-                customer.getCpf(),
-                customer.getEmail());
-    }
 }

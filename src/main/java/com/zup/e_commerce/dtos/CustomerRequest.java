@@ -16,6 +16,7 @@ public record CustomerRequest(
 
 
         @Email(message = "O email deve ser válido.")
+        @NotNull (message = "O email é obrigatório.")
         String email
 ) {
 }

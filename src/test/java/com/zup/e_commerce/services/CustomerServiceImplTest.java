@@ -33,7 +33,15 @@ class CustomerServiceImplTest {
     }
 
     @Test
-    public void whenAddCustomerWithValidRequest_shouldReturnCustomerResponse() {
+    void whenAddCustomerWithNullRequest_shouldThrowIllegalArgumentException() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            customerService.addCustomer(null);
+        });
+        assertEquals("CustomerRequest não pode ser nulo.", exception.getMessage());
+    }
+
+    @Test
+    public void whenAddCustomerWithValidRequest_shouldSaveAndReturnCustomerResponse() {
         // given: a valid customer request
         CustomerRequest customerRequest = new CustomerRequest("Name Test", "12345678909", "test@example.com");
         Customer customer = new Customer("Name Test", "12345678909", "test@example.com");
@@ -87,9 +95,4 @@ class CustomerServiceImplTest {
         assertEquals("Já existe um cliente cadastrado com o email: test@example.com.", exception.getMessage());
         verify(customerRepository, never()).save(any());
     }
-
-
-    //given
-    //when
-    //then
 }

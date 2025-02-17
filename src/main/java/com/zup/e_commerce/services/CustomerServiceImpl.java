@@ -28,6 +28,10 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerResponse addCustomer(CustomerRequest customerRequest) {
+        if (customerRequest == null) {
+            throw new IllegalArgumentException("CustomerRequest não pode ser nulo.");
+        }
+
         String cpf = customerRequest.cpf();
         if (customerRepository.existsByCpf(cpf)) {
             throw new DuplicateFieldException("Já existe um cliente cadastrado com o CPF: " + cpf + ".");

@@ -28,26 +28,18 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerResponse addCustomer(CustomerRequest customerRequest) {
-        if (customerRequest == null) {
-            throw new IllegalArgumentException("CustomerRequest não pode ser nulo.");
-        }
-
-        String cpf = customerRequest.cpf();
-        if (customerRepository.existsByCpf(cpf)) {
-            throw new DuplicateFieldException("Já existe um cliente cadastrado com o CPF: " + cpf + ".");
-        }
-
-        String email = customerRequest.email();
-        if (customerRepository.existsByEmail(email)) {
-            throw new DuplicateFieldException("Já existe um cliente cadastrado com o email: " + email + ".");
-        }
+        validateInputCustomerRequestNotNull(customerRequest);
+        validateUniqueFields(customerRequest);
 
         Customer customer = customerMapper.toEntity(customerRequest);
         customerRepository.save(customer);
+
         return customerMapper.toResponse(customer);
     }
+
+
     @Override
-    public List<CustomerResponse> getAllCustomers(){
+    public List<CustomerResponse> getAllCustomers() {
         return customerRepository.findAll()
                 .stream()
                 .map(customerMapper::toResponse)
@@ -56,23 +48,65 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerResponse getCustomerByCpf(String cpf) {
-        if (cpf == null){
-            throw new IllegalArgumentException("CPF não pode ser nulo.");
-        }
-        Customer customer = customerRepository.findByCpf(cpf)
-                .orElseThrow(() -> new CustomerNotFoundException("Cliente com CPF: " + cpf + " não encontrado."));
+        validateInputCpfNotNull(cpf);
+
+        Customer customer = findCustomerByCpf(cpf);
+
         return customerMapper.toResponse(customer);
     }
 
     @Override
     public CustomerResponse updateCustomer(String cpf, CustomerRequest customerRequest) {
-        Customer customer = customerRepository.findByCpf(cpf)
-                .orElseThrow(() -> new CustomerNotFoundException("Cliente com CPF: " + cpf + " não encontrado."));
-        customer.setName(customerRequest.name());
-        customer.setEmail(customerRequest.email());
+        validateInputCpfNotNull(cpf);
+
+        validateInputCustomerRequestNotNull(customerRequest);
+
+        Customer customer = findCustomerByCpf(cpf);
+
+        updateCustomerData(customer, customerRequest);
+
         customerRepository.save(customer);
+
         return customerMapper.toResponse(customer);
     }
 
+    private void validateInputCpfNotNull(String cpf) {
+        if (cpf == null) {
+            throw new IllegalArgumentException("CPF não pode ser nulo.");
+        }
+    }
+
+    private void validateInputCustomerRequestNotNull(CustomerRequest customerRequest) {
+        if (customerRequest == null) {
+            throw new IllegalArgumentException("CustomerRequest não pode ser nulo.");
+        }
+    }
+
+    private Customer findCustomerByCpf(String cpf) {
+        return customerRepository.findByCpf(cpf)
+                .orElseThrow(() -> new CustomerNotFoundException("Cliente com CPF: " + cpf + " não encontrado."));
+    }
+
+    private void updateCustomerData(Customer customer, CustomerRequest customerRequest) {
+        customer.setName(customerRequest.name());
+        customer.setEmail(customerRequest.email());
+    }
+
+    private void validateUniqueFields(CustomerRequest customerRequest) {
+        validateUniqueCpf(customerRequest.cpf());
+        validateUniqueEmail(customerRequest.email());
+    }
+
+    private void validateUniqueCpf(String cpf) {
+        if (customerRepository.existsByCpf(cpf)) {
+            throw new DuplicateFieldException("Já existe um cliente cadastrado com o CPF: " + cpf + ".");
+        }
+    }
+
+    private void validateUniqueEmail(String email) {
+        if (customerRepository.existsByEmail(email)) {
+            throw new DuplicateFieldException("Já existe um cliente cadastrado com o email: " + email + ".");
+        }
+    }
 
 }

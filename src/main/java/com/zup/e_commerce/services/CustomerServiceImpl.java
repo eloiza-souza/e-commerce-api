@@ -56,6 +56,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerResponse getCustomerByCpf(String cpf) {
+        if (cpf == null){
+            throw new IllegalArgumentException("CPF não pode ser nulo.");
+        }
         Customer customer = customerRepository.findByCpf(cpf)
                 .orElseThrow(() -> new CustomerNotFoundException("Cliente com CPF: " + cpf + " não encontrado."));
         return customerMapper.toResponse(customer);

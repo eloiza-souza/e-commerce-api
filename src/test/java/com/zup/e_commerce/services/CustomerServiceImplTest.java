@@ -103,7 +103,7 @@ class CustomerServiceImplTest {
 
     @Test
     void whenGetAllCustomersAndCustomersExists_shouldReturnListOfCustomerResponses() {
-       //given
+        //given
         Customer customer1 = new Customer("Name1", "12345678901", "email1@example.com");
         Customer customer2 = new Customer("Name2", "98765432109", "email2@example.com");
         CustomerResponse response1 = new CustomerResponse(1L, "Name1", "12345678901", "email1@example.com");
@@ -180,4 +180,36 @@ class CustomerServiceImplTest {
         verify(customerMapper, never()).toResponse(any());
     }
 
+    @Test
+    public void whenUpdateCustomerWithNullCpf_shouldThrowIllegalArgumentException(){
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            customerService.updateCustomer(null, null);
+        });
+        assertEquals("CPF não pode ser nulo.", exception.getMessage());
+    }
+
+    @Test
+    void whenUpdateCustomerWithNullCustomerRequest_shouldThrowIllegalArgumentException() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            customerService.updateCustomer("12345678909", null);
+        });
+        assertEquals("CustomerRequest não pode ser nulo.", exception.getMessage());
+    }
+
+    @Test
+    void whenUpdateCustomerWithValidData_shouldUpdateAndReturnCustomerResponse() {
+        String cpf = "12345678909";
+        CustomerRequest customerRequest = new CustomerRequest("Updated Name", cpf, "updated@example.com");
+        Customer customer = new Customer("Name Test", cpf, "email@test.com");
+        CustomerResponse response = new CustomerResponse(1L, "Updated Name", cpf, "updated@example.com");
+
+        when(customerRepository.findByCpf(cpf)).thenReturn(Optional.of(customer));
+        when(customerMapper.toResponse(customer)).thenReturn(response);
+
+        CustomerResponse result = customerService.updateCustomer(cpf, customerRequest);
+
+        assertNotNull(result);
+        assertEquals(response, result);
+        verify(customerRepository).save(customer);
+    }
 }

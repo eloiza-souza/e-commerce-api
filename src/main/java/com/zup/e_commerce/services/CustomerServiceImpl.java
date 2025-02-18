@@ -69,7 +69,6 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = customerRepository.findByCpf(cpf)
                 .orElseThrow(() -> new CustomerNotFoundException("Cliente com CPF: " + cpf + " não encontrado."));
         customer.setName(customerRequest.name());
-        customer.setCpf(customerRequest.cpf());
         customer.setEmail(customerRequest.email());
         customerRepository.save(customer);
         return customerMapper.toResponse(customer);

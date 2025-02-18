@@ -2,10 +2,10 @@ package com.zup.e_commerce.services;
 
 import com.zup.e_commerce.dtos.CustomerRequest;
 import com.zup.e_commerce.dtos.CustomerResponse;
+import com.zup.e_commerce.exceptions.CustomerNotFoundException;
 import com.zup.e_commerce.exceptions.DuplicateFieldException;
 import com.zup.e_commerce.mappers.CustomerMapper;
 import com.zup.e_commerce.models.Customer;
-import com.zup.e_commerce.models.Product;
 import com.zup.e_commerce.repositories.CustomerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -102,6 +103,7 @@ class CustomerServiceImplTest {
 
     @Test
     void whenGetAllCustomersAndCustomersExists_shouldReturnListOfCustomerResponses() {
+       //given
         Customer customer1 = new Customer("Name1", "12345678901", "email1@example.com");
         Customer customer2 = new Customer("Name2", "98765432109", "email2@example.com");
         CustomerResponse response1 = new CustomerResponse(1L, "Name1", "12345678901", "email1@example.com");
@@ -111,8 +113,10 @@ class CustomerServiceImplTest {
         when(customerMapper.toResponse(customer1)).thenReturn(response1);
         when(customerMapper.toResponse(customer2)).thenReturn(response2);
 
+        //when
         List<CustomerResponse> result = customerService.getAllCustomers();
 
+        //then
         assertNotNull(result, "A lista de respostas não deve ser nula.");
         assertEquals(2, result.size(), "A lista deve conter 2 elementos.");
         assertEquals(response1, result.get(0));
@@ -134,6 +138,46 @@ class CustomerServiceImplTest {
         verify(customerRepository).findAll();
         verify(customerMapper, never()).toResponse(any(Customer.class));
 
+    }
+
+    @Test
+    public void whenGetCustomerByCpfAndCpfIsNull_shouldThrowIllegalArgumentException(){
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            customerService.getCustomerByCpf(null);
+        });
+        assertEquals("CPF não pode ser nulo.", exception.getMessage());
+    }
+
+    @Test
+    public void whenGetCustomerByCpfAndCpfExists_shouldReturnCustomerResponse(){
+        //given
+        String cpf = "12345678909";
+        Customer customer = new Customer("Name Test", cpf, "email@test.com");
+        CustomerResponse response = new CustomerResponse(1L, "Name Test", cpf, "email@test.com");
+
+        when(customerRepository.findByCpf(cpf)).thenReturn(Optional.of(customer));
+        when(customerMapper.toResponse(customer)).thenReturn(response);
+
+        //when
+        CustomerResponse result = customerService.getCustomerByCpf(cpf);
+
+        //then
+        assertNotNull(result, "A resposta não deve ser nula.");
+        assertEquals(response, result);
+    }
+
+    @Test
+    public void whenGetCustomerByCpfAndCpfDoesNotExists_shouldReturnCustomerResponse(){
+        //given
+        String cpf = "12345678909";
+        when(customerRepository.findByCpf(cpf)).thenReturn(Optional.empty());
+
+        //when
+        CustomerNotFoundException exception = assertThrows(CustomerNotFoundException.class, () -> customerService.getCustomerByCpf(cpf));
+
+        // then
+        assertEquals("Cliente com CPF: " + cpf + " não encontrado.", exception.getMessage());
+        verify(customerMapper, never()).toResponse(any());
     }
 
 }
